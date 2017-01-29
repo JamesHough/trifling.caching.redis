@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+    <metadata>
+        <id>Trifling.Caching.Redis</id>
+        <version>0.2.0-beta</version>
+        <title>Trifling Caching Radis</title>
+        <authors>Trifling Contributors</authors>
+        <owners>JamesHough</owners>
+        <licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
+        <projectUrl>https://github.com/JamesHough/trifling.caching</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>A Trifling library for caching with the Redis caching engine.</description>
+        <summary>Trifling Caching Redis</summary>
+        <releaseNotes />
+        <copyright>Copyright 2017</copyright>
+        <tags>caching wrapper redis</tags>
+        <dependencies>
+            <group targetFramework=".NETStandard1.6">
+                <dependency id="Microsoft.Extensions.Options.ConfigurationExtensions" version="1.1.0" />
+                <dependency id="NETStandard.Library" version="1.6.1" />
+                <dependency id="Trifling.Common" version="0.2.2-beta" />
+                <dependency id="Trifling.Caching" version="0.2.0-beta" />
+                <dependency id="StackExchange.Redis" version="1.2.0" />
+                <dependency id="Microsoft.Extensions.Logging.Abstractions" version="1.1.0" />
+            </group>
+            <group targetFramework=".NETFramework4.5.2">
+                <dependency id="Microsoft.Extensions.Options.ConfigurationExtensions" version="1.1.0" />
+                <dependency id="Trifling.Common" version="0.2.2-beta" />
+                <dependency id="StackExchange.Redis" version="1.2.0" />
+                <dependency id="Trifling.Caching" version="0.2.0-beta" />
+                <dependency id="Microsoft.Extensions.Logging.Abstractions" version="1.1.0" />
+            </group>
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="bin\Debug\net452\Trifling.Caching.Redis.dll" target="lib\net452\Trifling.Caching.Redis.dll" />
+        <file src="bin\Debug\net452\Trifling.Caching.Redis.pdb" target="lib\net452\Trifling.Caching.Redis.pdb" />
+        <file src="bin\Debug\net452\Trifling.Caching.Redis.xml" target="lib\net452\Trifling.Caching.Redis.xml" />
+        <file src="bin\Debug\netstandard1.6\Trifling.Caching.Redis.dll" target="lib\netstandard1.6\Trifling.Caching.Redis.dll" />
+        <file src="bin\Debug\netstandard1.6\Trifling.Caching.Redis.pdb" target="lib\netstandard1.6\Trifling.Caching.Redis.pdb" />
+        <file src="bin\Debug\netstandard1.6\Trifling.Caching.Redis.xml" target="lib\netstandard1.6\Trifling.Caching.Redis.xml" />
+    </files>
+</package>
