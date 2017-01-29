@@ -85,6 +85,12 @@
             this._initialized = true;
         }
 
+        /// <summary>
+        /// Stores the given value in the Redis cache.
+        /// </summary>
+        /// <param name="cacheEntryKey">The unique key of the entry to create or overwrite in the cache.</param>
+        /// <param name="value">The data to store in the cache.</param>
+        /// <param name="expiry">The time period that the data will be valid.</param>
         public void Cache(string cacheEntryKey, byte[] value, TimeSpan expiry)
         {
             var db = this.GetDatabase();
@@ -92,6 +98,12 @@
             db.StringSet(cacheEntryKey, value, expiry);
         }
 
+        /// <summary>
+        /// Deletes the cache entry with the matching unique key. If the entry was found and successfully removed
+        /// then this will return true.  Otherwise this will return false.
+        /// </summary>
+        /// <param name="cacheEntryKey">The unique key identifying the cache entry to delete.</param>
+        /// <returns>Returns true if the entry was found and successfully removed from the cache. Otherwise false.</returns>
         public bool Remove(string cacheEntryKey)
         {
             var db = this.GetDatabase();
@@ -99,6 +111,12 @@
             return db.KeyDelete(cacheEntryKey);
         }
 
+        /// <summary>
+        /// Fetches a stored value from the cache. If the key was found then the value is returned. If not 
+        /// found then a null is returned.
+        /// </summary>
+        /// <param name="cacheEntryKey">The unique key of the cache entry to attempt to retrieve.</param>
+        /// <returns>Returns the located value from the cache if the key was found. Otherwise null.</returns>
         public byte[] Retrieve(string cacheEntryKey)
         {
             var db = this.GetDatabase();

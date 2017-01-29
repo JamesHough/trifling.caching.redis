@@ -2,8 +2,8 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
     <metadata>
         <id>Trifling.Caching.Redis</id>
-        <version>0.2.0-beta</version>
-        <title>Trifling Caching Radis</title>
+        <version>0.2.1-beta</version>
+        <title>Trifling Caching using Redis</title>
         <authors>Trifling Contributors</authors>
         <owners>JamesHough</owners>
         <licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
