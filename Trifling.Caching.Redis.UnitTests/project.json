@@ -2,7 +2,7 @@
   "title": "Trifling.Caching.Redis.UnitTests",
   "copyright": "James Hough 2017",
   "description": "The Unit Tests for the Trifling Caching Library for Redis",
-  "version": "0.2.1-*",
+  "version": "0.3.0-*",
   "buildOptions": {
     "emitEntryPoint": true
   },
@@ -14,7 +14,7 @@
     "Microsoft.Extensions.Logging.Abstractions": "1.1.0",
     "Moq": "4.6.38-alpha",
     "MSTest.TestFramework": "1.0.8-rc",
-    "Trifling.Caching.Redis": "0.2.1-beta"
+    "Trifling.Caching.Redis": "0.3.0-beta"
   },
 
   "runtimes": {
