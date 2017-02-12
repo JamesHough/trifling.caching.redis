@@ -2,13 +2,13 @@
   "title": "Trifling.Caching.Redis",
   "copyright": "James Hough 2017",
   "description": "Trifling Caching Library for Redis",
-  "version": "0.3.0-beta",
+  "version": "0.3.1-beta",
   "dependencies": {
     "Microsoft.Extensions.Logging.Abstractions": "1.1.0",
     "Microsoft.Extensions.Options.ConfigurationExtensions": "1.1.0",
     "StackExchange.Redis": "1.2.0",
-    "Trifling.Caching": "0.3.0-beta",
-    "Trifling.Common": "0.2.2-beta"
+    "Trifling.Caching": "0.3.1-beta",
+    "Trifling.Common": "0.3.0-beta"
   },
   "frameworks": {
     "netstandard1.6": {

@@ -15,6 +15,7 @@ namespace Trifling.Caching.Redis
     using StackExchange.Redis;
 
     using Trifling.Caching.Interfaces;
+    using Trifling.Comparison;
 
     /// <summary>
     /// An implementation of <see cref="ICacheEngine"/> for caching on a Redis server. 
@@ -359,7 +360,7 @@ namespace Trifling.Caching.Redis
                 return null;
             }
 
-            var returnSet = new SortedSet<byte[]>(ByteArrayComparer.Default);
+            var returnSet = new SortedSet<byte[]>(BoxedByteArrayComparer.Default);
 
             foreach (var setValue in db.SetScan(cacheEntryKey))
             {
@@ -502,7 +503,7 @@ namespace Trifling.Caching.Redis
         /// <param name="value">The value to append to the cached list.</param>
         /// <returns>Returns false if the cache entry doesn't exist or if the value cannot be appended. Otherwise true.</returns>
         public bool AppendToList<T>(string cacheEntryKey, T value)
-            where T : IComparable
+            where T : IConvertible
         {
             var db = this.GetDatabase();
 
@@ -1030,7 +1031,7 @@ namespace Trifling.Caching.Redis
         /// <param name="value">The value to append to the cached queue.</param>
         /// <returns>Returns false if the cache entry doesn't exist or if the value cannot be pushed to the queue. Otherwise true.</returns>
         public bool PushQueue<T>(string cacheEntryKey, T value)
-            where T : IComparable
+            where T : IConvertible
         {
             var db = this.GetDatabase();
 
