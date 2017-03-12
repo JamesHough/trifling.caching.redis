@@ -65,7 +65,7 @@ namespace Trifling.Caching.Redis
         /// Initialises the connection to Redis with the given configuration.
         /// </summary>
         /// <param name="cacheEngineConfiguration">The configuration options for connecting to Redis.</param>
-        public void Initialise(CacheEngineConfiguration cacheEngineConfiguration)
+        public void Initialize(CacheEngineConfiguration cacheEngineConfiguration)
         {
             // if the Initialise method was already called, then any existing connection will need to be closed
             // before reconfiguring with the new configuration.
@@ -105,6 +105,18 @@ namespace Trifling.Caching.Redis
             var db = this.GetDatabase();
 
             return db.KeyDelete(cacheEntryKey);
+        }
+
+        /// <summary>
+        /// Checks if any cached value exists with the specified <paramref name="cacheEntryKey"/>.
+        /// </summary>
+        /// <param name="cacheEntryKey">The unique identifier of the cache entry to seek in cache.</param>
+        /// <returns>If the cache entry was found, then returns true. Otherwise returns false.</returns>
+        public bool Exists(string cacheEntryKey)
+        {
+            var db = this.GetDatabase();
+
+            return db.KeyExists(cacheEntryKey);
         }
 
         #region Single value caching
@@ -369,7 +381,62 @@ namespace Trifling.Caching.Redis
 
             return returnSet;
         }
-        
+
+        /// <summary>
+        /// Attempts to locate the <paramref name="value"/> in a cached set.
+        /// </summary>
+        /// <typeparam name="T">The type of objects that are contained in the cached set.</typeparam>
+        /// <param name="cacheEntryKey">The unique key of the cached set to locate and within which to find the value.</param>
+        /// <param name="value">The value to locate in the existing set.</param>
+        /// <returns>Returns false if the cache entry doesn't exist or if the value is not present in the cached set.</returns>
+        public bool ExistsInSet<T>(string cacheEntryKey, T value)
+            where T : IConvertible
+        {
+            var db = this.GetDatabase();
+
+            if (!db.KeyExists(cacheEntryKey) || (db.KeyType(cacheEntryKey) != RedisType.Set))
+            {
+                return false;
+            }
+
+            return db.SetContains(cacheEntryKey, ValueToString(value));
+        }
+
+        /// <summary>
+        /// Attempts to locate the <paramref name="value"/> in a cached set.
+        /// </summary>
+        /// <param name="cacheEntryKey">The unique key of the cached set to locate and within which to find the value.</param>
+        /// <param name="value">The value to locate in the existing set.</param>
+        /// <returns>Returns false if the cache entry doesn't exist or if the value is not present in the cached set.</returns>
+        public bool ExistsInSet(string cacheEntryKey, byte[] value)
+        {
+            var db = this.GetDatabase();
+
+            if (!db.KeyExists(cacheEntryKey) || (db.KeyType(cacheEntryKey) != RedisType.Set))
+            {
+                return false;
+            }
+
+            return db.SetContains(cacheEntryKey, (byte[])(object)value);
+        }
+
+        /// <summary>
+        /// Gets the length of a set stored in the cache. If the key doesn't exist or isn't a set then returns null.
+        /// </summary>
+        /// <param name="cacheEntryKey">The unique key of the cached set to locate and for which the length must be read.</param>
+        /// <returns>Returns the length of the set if found, or null if not found.</returns>
+        public long? LengthOfSet(string cacheEntryKey)
+        {
+            var db = this.GetDatabase();
+
+            if (!db.KeyExists(cacheEntryKey) || (db.KeyType(cacheEntryKey) != RedisType.Set))
+            {
+                return null;
+            }
+
+            return db.SetLength(cacheEntryKey);
+        }
+
         #endregion Set caching
 
         #region List caching
@@ -537,50 +604,6 @@ namespace Trifling.Caching.Redis
         }
 
         /// <summary>
-        /// Injects a new value into an existing cached list at the position specified.
-        /// </summary>
-        /// <typeparam name="T">The type of object being injected into the cached list. All items of the list must be of the same type.</typeparam>
-        /// <param name="cacheEntryKey">The unique key of the cache entry which contains the list that the 
-        /// <paramref name="value"/> will be appended to.</param>
-        /// <param name="index">The zero-based position at which the value must be inserted in the list.</param>
-        /// <param name="value">The value to inject into the cached list.</param>
-        /// <returns>Returns false if the cache entry doesn't exist or if the value cannot be injected. Otherwise true.</returns>
-        public bool InjectInList<T>(string cacheEntryKey, long index, T value)
-            where T : IConvertible
-        {
-            var db = this.GetDatabase();
-
-            if (!db.KeyExists(cacheEntryKey) || (db.KeyType(cacheEntryKey) != RedisType.List))
-            {
-                return false;
-            }
-
-            db.ListInsertBefore(cacheEntryKey, index, ValueToString(value));
-            return true;
-        }
-
-        /// <summary>
-        /// Injects a new byte array value into an existing cached list at the position specified.
-        /// </summary>
-        /// <param name="cacheEntryKey">The unique key of the cache entry which contains the list that the 
-        /// <paramref name="value"/> will be appended to.</param>
-        /// <param name="index">The zero-based position at which the value must be inserted in the list.</param>
-        /// <param name="value">The byte array value to inject into the cached list.</param>
-        /// <returns>Returns false if the cache entry doesn't exist or if the value cannot be injected. Otherwise true.</returns>
-        public bool InjectInList(string cacheEntryKey, long index, byte[] value)
-        {
-            var db = this.GetDatabase();
-
-            if (!db.KeyExists(cacheEntryKey) || (db.KeyType(cacheEntryKey) != RedisType.List))
-            {
-                return false;
-            }
-
-            db.ListInsertBefore(cacheEntryKey, index, value);
-            return true;
-        }
-
-        /// <summary>
         /// Truncates values from the cached list so that only the values in the range specified remain.
         /// </summary>
         /// <example>
@@ -653,6 +676,23 @@ namespace Trifling.Caching.Redis
         {
             // for clearing we can use the shrink method to shrink to an empty length.
             return this.ShrinkList(cacheEntryKey, -1L, 0L);
+        }
+
+        /// <summary>
+        /// Gets the length of a list stored in the cache. If the key doesn't exist or isn't a list then returns null.
+        /// </summary>
+        /// <param name="cacheEntryKey">The unique key of the cached list to locate and for which the length must be read.</param>
+        /// <returns>Returns the length of the list if found, or null if not found.</returns>
+        public long? LengthOfList(string cacheEntryKey)
+        {
+            var db = this.GetDatabase();
+
+            if (!db.KeyExists(cacheEntryKey) || (db.KeyType(cacheEntryKey) != RedisType.List))
+            {
+                return null;
+            }
+
+            return db.ListLength(cacheEntryKey);
         }
 
         #endregion List caching
@@ -949,6 +989,38 @@ namespace Trifling.Caching.Redis
             return true;
         }
 
+        /// <summary>
+        /// Attempts to locate the <paramref name="dictionaryKey"/> in a cached dictionary.
+        /// </summary>
+        /// <param name="cacheEntryKey">The unique key of the cache entry which contains the dictionary.</param>
+        /// <param name="dictionaryKey">The unique name within the dictionary for the value being sought.</param>
+        /// <returns>Returns false if the cache entry doesn't exist or if the key is not present in the cached dictionary.</returns>
+        public bool ExistsInDictionary(string cacheEntryKey, string dictionaryKey)
+        {
+            var db = this.GetDatabase();
+
+            return db.KeyExists(cacheEntryKey)
+                 && (db.KeyType(cacheEntryKey) == RedisType.Hash)
+                 && db.HashExists(cacheEntryKey, dictionaryKey);
+        }
+
+        /// <summary>
+        /// Gets the length of a dictionary stored in the cache. If the key doesn't exist or isn't a dictionary then returns null.
+        /// </summary>
+        /// <param name="cacheEntryKey">The unique key of the cached dictionary to locate and for which the length must be read.</param>
+        /// <returns>Returns the length of the dictionary if found, or null if not found.</returns>
+        public long? LengthOfDictionary(string cacheEntryKey)
+        {
+            var db = this.GetDatabase();
+
+            if (!db.KeyExists(cacheEntryKey) || (db.KeyType(cacheEntryKey) != RedisType.Hash))
+            {
+                return null;
+            }
+
+            return db.HashLength(cacheEntryKey);
+        }
+
         #endregion Dictionary caching
 
         #region Queue caching
@@ -1126,6 +1198,23 @@ namespace Trifling.Caching.Redis
             db.ListTrim(cacheEntryKey, -1, 0);
 
             return true;
+        }
+
+        /// <summary>
+        /// Gets the length of a queue stored in the cache. If the key doesn't exist or isn't a queue then returns null.
+        /// </summary>
+        /// <param name="cacheEntryKey">The unique key of the cached queue to locate and for which the length must be read.</param>
+        /// <returns>Returns the length of the queue if found, or null if not found.</returns>
+        public long? LengthOfQueue(string cacheEntryKey)
+        {
+            var db = this.GetDatabase();
+
+            if (!db.KeyExists(cacheEntryKey) || (db.KeyType(cacheEntryKey) != RedisType.List))
+            {
+                return null;
+            }
+
+            return db.ListLength(cacheEntryKey);
         }
 
         #endregion Queue caching
